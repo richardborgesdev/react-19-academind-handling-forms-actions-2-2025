@@ -1,14 +1,21 @@
-import { use, useActionState } from "react";
+import { use, useActionState, useOptimistic } from "react";
 import { OpinionsContext } from "../store/opinions-context";
 
 export function Opinion({ opinion: { id, title, body, userName, votes } }) {
   const useOpinionsContext = use(OpinionsContext);
 
+  const [optimisticVotes, setVotesOptimistically] = useOptimistic(
+    votes,
+    (prevVote, mode) => (mode === "up" ? prevVote + 1 : prevVote - 1)
+  );
+
   async function upvoteAction() {
+    setVotesOptimistically("up");
     await useOpinionsContext.upvoteOpinion(id);
   }
 
   async function downvoteAction() {
+    setVotesOptimistically("down");
     await useOpinionsContext.downvoteOpinion(id);
   }
 
